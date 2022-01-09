@@ -104,7 +104,7 @@ class Home extends Component {
         return (
             <div>
                 
-                <Header  />
+                <Header isLoggedIn = 'false'  />
                
                 <div className='text-center upcoming-movies-header'><Typography sx={{ color: 'black' }} component='span'>
                     Upoming Movies

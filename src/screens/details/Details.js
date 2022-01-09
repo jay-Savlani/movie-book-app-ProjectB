@@ -29,15 +29,20 @@ const Details = (props) => {
 
         let fetchedMovieData = moviesData.filter(fetchedMovie => fetchedMovie.title === movie);
         let fetchedTitle = fetchedMovieData[0].title;
+        
         setTitle(fetchedTitle);
         let fetchedPoster = fetchedMovieData[0].poster_url;
+        
         setMoviePoster(fetchedPoster);
         let fetchedGenres = fetchedMovieData[0].genres;
+        
         setMovieGenres(fetchedGenres);
         let fetchedArtists = fetchedMovieData[0].artists;
+        
         setMovieArtists(fetchedArtists);
         let fetchedDuration = fetchedMovieData[0].duration;
         setDuration(fetchedDuration);
+        
         let MyDateString = new Date(fetchedMovieData[0].release_date).toLocaleString('en-US', {
             weekday: 'short',
             month: 'short',
@@ -45,19 +50,23 @@ const Details = (props) => {
             year: 'numeric'
         });
         setReleaseDate(MyDateString);
-        let fetchedRating = fetchedMovieData[0].rating;
+        
+        let fetchedRating = fetchedMovieData[0].critics_rating;
+       
         setRating(fetchedRating);
         let fetchedStory = fetchedMovieData[0].storyline;
         setStory(fetchedStory);
+        
         let fetchedWikiUrl = fetchedMovieData[0].wiki_url;
         setWikiUrl(fetchedWikiUrl);
+        
         let fetchedYoutubeId = fetchedMovieData[0].trailer_url.substring(32);
         setYoutubeId(fetchedYoutubeId);
 
         console.log(fetchedYoutubeId);
 
 
-        console.log('Movie Param: ', movie);
+        // console.log('Movie Param: ', movie);
         // console.log('Filtered Movie Details', fetchedMovieData);
         // console.log('Movie State', movieDetails);
         // console.log("Genres" , genres);
@@ -119,6 +128,7 @@ const Details = (props) => {
                         {`${releaseDate}`}
                     </Typography>
                     <Typography >
+                        {console.log(rating)}
                         <span className='bold'>Rating: </span>
                         {`${rating}`}
                     </Typography>
