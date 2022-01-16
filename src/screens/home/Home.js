@@ -85,13 +85,37 @@ const Home = (props) => {
     }
 
     useEffect(() => {
-        setState({
-            ...state,
-            upComingMovies: moviesData,
-            releasedMovies: moviesData,
-            movieGenres: genres,
-            movieArtists: artists 
-        })
+        
+
+        // Fetch Request Upcoming movies
+        fetch(`${props.rootUrl}movies?status=PUBLISHED`).
+            then(response => response.json()).
+            then(responseObj => {
+                setState({ ...state, upComingMovies: responseObj });
+            });
+
+
+        // Fetch Request Released movies
+        fetch(`${props.rootUrl}movies?status=RELEASED`).
+            then(response => response.json()).
+            then(responseObj => {
+                setState({ ...state, releasedMovies: responseObj });
+            });
+
+        // Fetch Request Genres
+        fetch(`${props.rootUrl}genres`).
+            then(response => response.json()).
+            then(responseObj => {
+                setState({ ...state, movieGenres: responseObj });
+            });
+
+
+        // Fetch Request Genres
+        fetch(`${props.rootUrl}artists`).
+            then(response => response.json()).
+            then(responseObj => {
+                setState({ ...state, movieArtists: responseObj });
+            });
     }, [])
 
 
