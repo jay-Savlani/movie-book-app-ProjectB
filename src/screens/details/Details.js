@@ -1,77 +1,35 @@
-import React, { Component, useEffect, useState } from 'react';
-
+import React, {  useEffect, useState } from 'react';
 import { Header } from '../../common/header/Header';
 import './Details.css'
-import { Button, Typography, Rating, ImageList, ImageListItem, ImageListItemBar } from '@mui/material';
-import { useParams, useNavigate } from 'react-router-dom';
+import {Typography, Rating, ImageList, ImageListItem, ImageListItemBar } from '@mui/material';
+import {useNavigate, useParams } from 'react-router-dom';
 import moviesData from '../../common/moviesData';
 import YouTube from 'react-youtube';
 
 const Details = (props) => {
 
+    const {id} = useParams();
 
-    let [moviePoster, setMoviePoster] = useState("");
-    let [title, setTitle] = useState('');
-    let [genres, setMovieGenres] = useState([]);
-    let [artists, setMovieArtists] = useState([]);
-    let [duration, setDuration] = useState(0);
-    let [releaseDate, setReleaseDate] = useState("");
-    let [rating, setRating] = useState(0);
-    let [story, setStory] = useState('');
-    let [wiki_url, setWikiUrl] = useState("");
-    let [youtube_id, setYoutubeId] = useState("");
-    let [userRating, setUserRating] = useState(0);
-    const { movie } = useParams();
+    const [fetchedMovie, setFetchedMovie] = useState({
+        genres: [],
+        trailer_url: '',
+        artists: []
+    });
+    const [userRating, setUserRating] = useState(0);
+    
 
     const navigate = useNavigate();
 
     useEffect(() => {
 
-        let fetchedMovieData = moviesData.filter(fetchedMovie => fetchedMovie.title === movie);
-        let fetchedTitle = fetchedMovieData[0].title;
-        
-        setTitle(fetchedTitle);
-        let fetchedPoster = fetchedMovieData[0].poster_url;
-        
-        setMoviePoster(fetchedPoster);
-        let fetchedGenres = fetchedMovieData[0].genres;
-        
-        setMovieGenres(fetchedGenres);
-        let fetchedArtists = fetchedMovieData[0].artists;
-        
-        setMovieArtists(fetchedArtists);
-        let fetchedDuration = fetchedMovieData[0].duration;
-        setDuration(fetchedDuration);
-        
-        let MyDateString = new Date(fetchedMovieData[0].release_date).toLocaleString('en-US', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
-        setReleaseDate(MyDateString);
-        
-        let fetchedRating = fetchedMovieData[0].critics_rating;
+        fetch(`${props.rootUrl}movies/${id}`)
+        .then(reponse => reponse.json())
+        .then(reponse => {
+            setFetchedMovie(reponse[0]);
+        })
        
-        setRating(fetchedRating);
-        let fetchedStory = fetchedMovieData[0].storyline;
-        setStory(fetchedStory);
-        
-        let fetchedWikiUrl = fetchedMovieData[0].wiki_url;
-        setWikiUrl(fetchedWikiUrl);
-        
-        let fetchedYoutubeId = fetchedMovieData[0].trailer_url.substring(32);
-        setYoutubeId(fetchedYoutubeId);
 
-        console.log(fetchedYoutubeId);
-
-
-        // console.log('Movie Param: ', movie);
-        // console.log('Filtered Movie Details', fetchedMovieData);
-        // console.log('Movie State', movieDetails);
-        // console.log("Genres" , genres);
-
-    }, [movie]);
+    }, [id]);
 
     const VideoReady = (e) => {
         // access to player in all event handlers via event.target
@@ -86,7 +44,7 @@ const Details = (props) => {
 
     return (
         <div>
-            <Header isLoggedIn = 'false' />
+            <Header id={id} showBookShowButton={true} />
 
             <Typography
                 ml='24px'
@@ -106,44 +64,43 @@ const Details = (props) => {
             <div className='details-container'>
                 {/* {console.log(' Movie Details First Element ',movieDetails[0])} */}
                 <div className='details-left'>
-                    <img src={moviePoster} alt={title} />
+                    <img src={fetchedMovie.poster_url} alt={fetchedMovie.title} />
                 </div>
                 <div className='details-middle'>
                     <Typography variant='headline' component='h2'>
-                        {title}
+                        {fetchedMovie.title}
                     </Typography>
                     <Typography >
                         <span className='bold'>Genre: </span>
                         {
-                            genres.map(genre => genre).join(', ')
+                            fetchedMovie.genres.map(genre => genre).join(', ')
 
                         }
                     </Typography>
                     <Typography >
                         <span className='bold'>Duration: </span>
-                        {`${duration} mins`}
+                        {`${fetchedMovie.duration} mins`}
                     </Typography>
                     <Typography >
                         <span className='bold'>Release Date: </span>
-                        {`${releaseDate}`}
+                        {`${fetchedMovie.release_date}`}
                     </Typography>
                     <Typography >
-                        {console.log(rating)}
                         <span className='bold'>Rating: </span>
-                        {`${rating}`}
+                        {`${fetchedMovie.critic_rating}`}
                     </Typography>
                     <Typography sx={{ mt: '16px' }}>
 
                         <span className='bold'>Plot: </span>
-                        <a href={wiki_url} target="_blank">(Wiki Link) </a>
-                        {`${story}`}
+                        <a href={fetchedMovie.wiki_url} target="_blank">(Wiki Link) </a>
+                        {`${fetchedMovie.story_line}`}
                     </Typography>
                     <Typography sx={{ mt: '16px' }}>
 
                         <span className='bold'>Trailer: </span>
 
                     </Typography>
-                    <YouTube videoId={youtube_id} opts={{
+                    <YouTube videoId={fetchedMovie.trailer_url.substring(32)} opts={{
                         height: '450',
                         width: '100%',
                         playerVars: {
@@ -174,7 +131,7 @@ const Details = (props) => {
 
                     >
                         {
-                            artists.map((artist,index) => {
+                            fetchedMovie.artists.map((artist,index) => {
                                 return (
                                     <ImageListItem alt={`${artist.first_name} ${artist.last_name}`} key={index}>
                                         <img src={artist.profile_url} alt={`${artist.first_name} ${artist.last_name}`} />

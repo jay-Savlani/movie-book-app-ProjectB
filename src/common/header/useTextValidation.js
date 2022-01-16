@@ -11,7 +11,7 @@ const useTextValidation = () => {
     reg_password: '',
     reg_contact: 0,
   });
-  const [registeration_msg, setRegisterationMsg]= useState('');
+ 
 
 
   const [error, setError] = useState({
@@ -80,22 +80,6 @@ const useTextValidation = () => {
   }
 
 
-  const handleSignUp = () => {
-    if(
-      
-      !error.reg_first_name.errorBool &&
-      !error.reg_last_name.errorBool &&
-      !error.reg_email.errorBool &&
-      !error.reg_password.errorBool &&
-      !error.reg_contact.errorBool
-    ) {
-      setRegisterationMsg('Registration Successful. Please Login!');
-    }
-    else {
-      setRegisterationMsg('');
-    }
-  }
-
 
   return [
     userDetails.login_username,
@@ -106,9 +90,9 @@ const useTextValidation = () => {
     userDetails.reg_password,
     userDetails.reg_contact,
     error,
-    registeration_msg,
+   
     handleValidation,
-    handleSignUp
+    
   ]
 }
 

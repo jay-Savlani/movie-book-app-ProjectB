@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 // import Modal from '@mui/material/Modal';
 import Modal from 'react-modal';
 import { useTextValidation } from './useTextValidation';
+import { letterSpacing } from '@mui/system';
 
 
 function TabPanel(props) {
@@ -47,7 +48,7 @@ function a11yProps(index) {
 const ModalFunc = (props) => {
 
   const [tabValue, setTabValue] = useState(0);
-  
+  const [registerationSuccess, setRegisterationSuccess] = useState(false);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -63,17 +64,71 @@ const ModalFunc = (props) => {
     reg_password,
     reg_contact,
     error,
-    registeration_msg,
+    
     handleValidation,
-    handleSignUp
   ] = useTextValidation();
 
+  const loginClickHandler = () => {
+    if (!error.login_username.errorBool && !error.login_password.errorBool) {
+      let raw = null;
+
+      let requestOptions = {
+        method: 'POST',
+        body: raw,
+        redirect: 'follow'
+      };
+
+      fetch("http://localhost:8085/api/auth/login", requestOptions).
+        then(response => response.json()).
+        then(response => {
+          sessionStorage.setItem("uuid", response.uuid);
+          sessionStorage.setItem("access-token", response["access-token"])
+        })
+      props.handleModalClose();
+      props.setIsLoggedIn(true);
+
+    }
+    else
+      props.setIsLoggedIn(false);
+  }
+  const registerClickHandler = () => {
+    if (!error.reg_first_name.errorBool &&
+      !error.reg_last_name.errorBool &&
+      !error.reg_email.errorBool &&
+      !error.reg_password.errorBool &&
+      !error.reg_contact.errorBool) {
+      let dataSignup = JSON.stringify({
+        "email_address": reg_email,
+        "first_name": reg_first_name,
+        "last_name": reg_last_name,
+        "mobile_number": reg_contact,
+        "password": reg_password
+      });
+
+      let requestOptions = {
+        method: 'POST',
+        body: dataSignup,
+        redirect: 'follow'
+      };
+
+      fetch("http://localhost:8085/api/auth/signup", requestOptions).
+        then(response => response.json()).
+        then(response => {
+          setRegisterationSuccess(true);
+        })
+      
+        setRegisterationSuccess(true);
+
+        
+    }
+
+  }
 
 
   return (
     <Modal
       isOpen={props.open}
-      onRequestClose={props.handleClose}
+      onRequestClose={props.handleModalClose}
       style={modal_style}
       currentLabel='Example Modal'
     >
@@ -114,7 +169,7 @@ const ModalFunc = (props) => {
               />
             </FormControl>
             <FormControl>
-              <Button sx={{ width: '30%', alignSelf: 'center' }} color='primary' variant='contained'>
+              <Button onClick={loginClickHandler} sx={{ width: '30%', alignSelf: 'center' }} color='primary' variant='contained'>
                 LOGIN
 
               </Button>
@@ -127,7 +182,7 @@ const ModalFunc = (props) => {
               <TextField
                 name='reg_first_name'
                 label='First Name'
-                variant='standard'required
+                variant='standard' required
                 onChange={handleValidation}
                 value={reg_first_name}
                 error={error.reg_first_name.errorBool}
@@ -191,9 +246,9 @@ const ModalFunc = (props) => {
                 autoComplete='off'
               />
             </FormControl>
-            <Typography>{registeration_msg}</Typography>
+            <Typography>{registerationSuccess &&  "Registeration Successful, Please sign in"}</Typography>
             <FormControl>
-              <Button onClick={handleSignUp} sx={{ width: '30%', alignSelf: 'center' }} color='primary' variant='contained'>REGISTER</Button>
+              <Button onClick={registerClickHandler} sx={{ width: '30%', alignSelf: 'center' }} color='primary' variant='contained'>REGISTER</Button>
             </FormControl>
           </Box>
         </TabPanel>

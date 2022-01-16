@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Header } from '../../common/header/Header';
 import './Home.css';
-import moviesData from '../../common/moviesData';
+
 import { convertDate, doesDateExists } from './convertDate';
-import genres from '../../common/movieGenres';
-import artists from '../../common/movieArtists';
+
 import {
     ImageList,
     ImageListItem,
@@ -31,6 +30,7 @@ const Home = (props) => {
 
     let [state, setState] = useState({
         upComingMovies: [],
+        releasedMoviesAll : [],
         releasedMovies: [],
         movieGenres: [],
         movieArtists: [],
@@ -49,26 +49,38 @@ const Home = (props) => {
         })
     }
 
+    // API Calls Made
     const handeApply = (e) => {
 
-        let { upComingMovies, movieName, genre, artist, releaseDateStart, releaseDateEnd } = state;
+        let { upComingMovies, releasedMoviesAll , movieName, genre, artist, releaseDateStart, releaseDateEnd } = state;
         let newMoviesData = [];
-        // console.log(moviesData);
-        // debugger;
-        let filteredMovies = upComingMovies.filter(
-            movie => genre.some(element => movie.genres.includes(element)) ||
-                (movie.title.toLowerCase().indexOf(movieName.toLowerCase()) > -1 && movieName.length > 0) ||
-                artist.some(element => {
-                    return movie.artists.some(value => {
-                        return element.search(value.first_name) >= 0
-                    })
-                }) ||
-                doesDateExists(releaseDateStart, releaseDateEnd, movie.release_date)
+       
+        let queryString = "?status=RELEASED";
+        if (this.state.movieName !== "") {
+            queryString += "&title=" + movieName;
+        }
+        if (this.state.genres.length > 0) {
+            queryString += "&genres=" + genre.toString();
+        }
+        if (this.state.artists.length > 0) {
+            queryString += "&artists=" + artist.toString();
+        }
+        if (this.state.releaseDateStart !== "") {
+            queryString += "&start_date=" + releaseDateStart.toLocaleDateString("en-US");
+        }
+        if (this.state.releaseDateEnd !== "") {
+            queryString += "&end_date=" + releaseDateEnd.toLocaleDateString("en-US");
+        }
 
-        )
-        newMoviesData = filteredMovies;
+        // Fetch Filtered Released Movies
+        fetch(`${props.rootUrl}movies${queryString}`).
+            then(response => response.json()).
+            then(responseObj => {
+                newMoviesData = responseObj.movies
+            });
+       
         setState({
-            ...state, releasedMovies: e.target.name === "filter" ? newMoviesData : moviesData
+            ...state, releasedMovies: e.target.name === "filter" ? newMoviesData : releasedMoviesAll
         });
 
         if (e.target.name === 'reset') {
@@ -77,13 +89,14 @@ const Home = (props) => {
                 genre: [],
                 artist: [],
                 movieName: "",
+                releasedMovies: releasedMoviesAll,
                 releaseDateStart: null,
                 releaseDateEnd: null,
-                releasedMovies: upComingMovies
             })
         }
     }
 
+    // API Calls Made
     useEffect(() => {
         
 
@@ -99,7 +112,7 @@ const Home = (props) => {
         fetch(`${props.rootUrl}movies?status=RELEASED`).
             then(response => response.json()).
             then(responseObj => {
-                setState({ ...state, releasedMovies: responseObj });
+                setState({ ...state, releasedMovies: responseObj, releasedMoviesAll: responseObj });
             });
 
         // Fetch Request Genres
@@ -180,7 +193,7 @@ const Home = (props) => {
                                 const readableDate = convertDate(movie.release_date);
                                 return (
                                     <Link key={movie.id} to={{
-                                        pathname: `/Details/${movie.title}`,
+                                        pathname: `/movie/${movie.movieid}`,
 
                                     }} >
                                         <ImageListItem

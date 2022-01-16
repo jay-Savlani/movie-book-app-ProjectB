@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import { RoutePaths } from './screens/routepaths/RoutePaths';
+import {Controller} from './screens/Controller'
 // import { Home } from './screens/home/Home';
 
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <div>
-    <RoutePaths />
+    <Controller />
     </div>,
   document.getElementById('root')
 );
